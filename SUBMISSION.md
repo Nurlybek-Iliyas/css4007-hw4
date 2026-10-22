@@ -38,31 +38,87 @@ If a fact is missing, the model can request another lookup.
 - I use exact district names to avoid confusion.
 
 
+
 ### A2 — The two tools
 
 #### `lookup`
 
 ```json
+{
+  "type": "function",
+  "function": {
+    "name": "lookup",
+    "description": "Find a fact about a district or the region in the Nine Rivers documents. Use this tool before doing calculations. Give an exact subject and field name. It uses current profiles, ignores archived data, applies corrections, and returns the source document ID.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "Exact district name, for example Brightwater, or Nine Rivers Region for regional data."
+        },
+        "field": {
+          "type": "string",
+          "description": "Fact needed, for example population_2025, population_2020, area_km2, schools, pupils, water_use_m3, budget_million_tenge, paved_road_km, founded_year, or water_tariff_2025."
+        }
+      },
+      "required": ["subject", "field"],
+      "additionalProperties": false
+    }
+  }
+}
 ```
 
 | Case | What the tool returns |
 |---|---|
-| success | |
-| | |
+| success | JSON with subject, field, value, unit and source |
+| district not found | Error with possible district names |
+| field not found | Error explaining that the field is unavailable |
+| similar names | Uses exact matching and never guesses |
+| archived profile | Uses the current 2025 profile instead |
+| corrected value | Uses the correction notice and includes its source |
+| invalid input | Returns an error without crashing |
 
 **Worst thing it could do with strange or dangerous input:**
+
+The model could request a wrong district or field and get incorrect data if the tool guesses. My tool will use exact names, return errors for unknown inputs, and never open arbitrary files or execute user input.
 
 #### `calculate`
 
 ```json
+{
+  "type": "function",
+  "function": {
+    "name": "calculate",
+    "description": "Calculate a mathematical expression using numbers and basic arithmetic. Use this tool for divisions, percentages, differences and unit conversions. Only +, -, *, /, parentheses and numeric values are allowed. Do not send Python code.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "description": "A mathematical expression such as 44675 / 921.4 or (100 - 80) / 80 * 100."
+        }
+      },
+      "required": ["expression"],
+      "additionalProperties": false
+    }
+  }
+}
 ```
 
 | Case | What the tool returns |
 |---|---|
-| success | |
-| | |
+| success | JSON with expression and numeric result |
+| division by zero | Error: division by zero |
+| invalid expression | Error: invalid mathematical expression |
+| dangerous Python code | Error: operation not allowed |
+| very large number | Error: number exceeds the allowed limit |
+| empty expression | Error: expression is empty |
 
 **Worst thing it could do with strange or dangerous input:**
+
+A dangerous expression could run unwanted Python code or use too much memory. I will use Python's `ast` module instead of `eval` or `exec`. Only basic arithmetic will be allowed. I will also limit expression length and number size.
+
+
 
 ### A3 — Q-09 by hand
 
