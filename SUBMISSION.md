@@ -120,12 +120,152 @@ A dangerous expression could run unwanted Python code or use too much memory. I 
 
 
 
+
 ### A3 — Q-09 by hand
 
+This is my expected conversation between the model and my two tools.
+
 ```json
+[
+  {
+    "role": "user",
+    "content": "Which district has the higher population density in 2025, Brightwater or Millbrook, and by how many residents per square kilometre?"
+  },
+  {
+    "role": "assistant",
+    "tool_calls": [
+      {
+        "id": "call_1",
+        "type": "function",
+        "function": {
+          "name": "lookup",
+          "arguments": "{\"subject\":\"Brightwater\",\"field\":\"population_2025\"}"
+        }
+      },
+      {
+        "id": "call_2",
+        "type": "function",
+        "function": {
+          "name": "lookup",
+          "arguments": "{\"subject\":\"Brightwater\",\"field\":\"area_km2\"}"
+        }
+      },
+      {
+        "id": "call_3",
+        "type": "function",
+        "function": {
+          "name": "lookup",
+          "arguments": "{\"subject\":\"Millbrook\",\"field\":\"population_2025\"}"
+        }
+      },
+      {
+        "id": "call_4",
+        "type": "function",
+        "function": {
+          "name": "lookup",
+          "arguments": "{\"subject\":\"Millbrook\",\"field\":\"area_km2\"}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_1",
+    "content": "{\"value\":44675,\"unit\":\"residents\",\"source\":\"NR-05\"}"
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_2",
+    "content": "{\"value\":921.4,\"unit\":\"km2\",\"source\":[\"NR-05\",\"NR-16\"]}"
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_3",
+    "content": "{\"value\":37203,\"unit\":\"residents\",\"source\":\"NR-11\"}"
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_4",
+    "content": "{\"value\":758.6,\"unit\":\"km2\",\"source\":\"NR-11\"}"
+  },
+  {
+    "role": "assistant",
+    "tool_calls": [
+      {
+        "id": "call_5",
+        "type": "function",
+        "function": {
+          "name": "calculate",
+          "arguments": "{\"expression\":\"44675 / 921.4\"}"
+        }
+      },
+      {
+        "id": "call_6",
+        "type": "function",
+        "function": {
+          "name": "calculate",
+          "arguments": "{\"expression\":\"37203 / 758.6\"}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_5",
+    "content": "{\"result\":48.48599956587801}"
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_6",
+    "content": "{\"result\":49.041655681518584}"
+  },
+  {
+    "role": "assistant",
+    "tool_calls": [
+      {
+        "id": "call_7",
+        "type": "function",
+        "function": {
+          "name": "calculate",
+          "arguments": "{\"expression\":\"49.041655681518584 - 48.48599956587801\"}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_7",
+    "content": "{\"result\":0.5556561156405735}"
+  },
+  {
+    "role": "assistant",
+    "content": "Millbrook has a higher population density by 0.6 residents per square kilometre. ANSWER: Millbrook | 0.6"
+  }
+]
 ```
 
 **My arithmetic:**
+
+Population density = Population / Area
+
+Brightwater:
+44675 / 921.4 = 48.486 residents/km2
+
+Millbrook:
+37203 / 758.6 = 49.042 residents/km2
+
+Difference:
+49.041656 - 48.486000 = 0.555656
+
+Rounded to one decimal place:
+0.6 residents/km2
+
+The higher density is in Millbrook.
+
+I used NR-16 because it corrects Brightwater's area from 912.4 to 921.4 km2. The corrected value must be used.
+
+Final answer: Millbrook | 0.6
+
 
 ### A4 — Why I split it this way
 
