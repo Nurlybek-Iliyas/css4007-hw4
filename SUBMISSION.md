@@ -8,19 +8,35 @@
 
 > Commit this whole part before any `.py` file exists.
 
+
 ### A1 — The steps
 
 | # | Step | What goes in (types) | What comes out (types) | When it goes wrong | Tool, loop, or model? |
 |---|---|---|---|---|---|
-| 1 | | | | | |
+| 1 | Understand the question | question (str) | district names (list), fields (list), operation (str) | The question is unclear | Model |
+| 2 | Find the facts | district (str), field (str) | value (float), unit (str), source (str) | No match, similar names, or missing data | lookup tool |
+| 3 | Check the data | facts (dict), sources (list) | checked facts (dict) | Old profile, correction, or wrong year | lookup tool |
+| 4 | Prepare numbers | values (list), units (list) | numbers (list) | Invalid number or unknown unit | Model and loop |
+| 5 | Do the calculation | expression (str) | result (float) | Division by zero or invalid expression | calculate tool |
+| 6 | Compare the results | results (list) | district name (str), difference (float) | Missing result or unclear comparison | Model |
+| 7 | Give the final answer | name (str), number (float) | answer (str) | Wrong format or rounding | Model and loop |
 
 **How the steps connect:**
 
-<!-- which step feeds which: a list, an ASCII diagram, or an image committed to the repo -->
+Question → Understand → Lookup → Check data → Prepare numbers → Calculate → Compare → Final answer.
+
+If a fact is missing, the model can request another lookup.
 
 **What I am assuming:**
 
-<!-- census year, archived profiles, corrections, units, where rounding happens, ... -->
+- I use the 2025 data unless the question asks for another year.
+- Archived profiles are not used when newer data exists.
+- Correction notices have priority over original profiles.
+- I use the correct units before calculation.
+- For water calculations, 1 megalitre = 1000 cubic metres.
+- I keep full precision during calculations and round only the final answer.
+- I use exact district names to avoid confusion.
+
 
 ### A2 — The two tools
 
