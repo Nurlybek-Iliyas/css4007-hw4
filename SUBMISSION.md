@@ -269,7 +269,17 @@ Final answer: Millbrook | 0.6
 
 ### A4 — Why I split it this way
 
-<!-- one other way to split the task, and why you did not choose it -->
+### A4 — Why I split it this way
+
+Another way was to create one big tool called `answer_question`. This tool would search documents, calculate numbers, and give the final answer.
+
+I did not choose this method because it is difficult to find mistakes. If the answer is wrong, I cannot easily see if the problem is in the data or the calculation.
+
+I chose two separate tools: `lookup` and `calculate`.
+
+The `lookup` tool finds facts and shows the source document. The `calculate` tool does the mathematics.
+
+This method is easier to test and understand. I can check each step separately. It is also safer because the calculator accepts only basic arithmetic.
 
 ---
 
